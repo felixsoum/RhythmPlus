@@ -22,4 +22,9 @@ public class Slider : MonoBehaviour
         pointerPos.x = Mathf.Lerp(leftBound, rightBound, currentPointerValue);
         pointer.transform.localPosition = pointerPos;
     }
+
+    public float GetPointerX()
+    {
+        return pointer.transform.position.x;
+    }
 }
