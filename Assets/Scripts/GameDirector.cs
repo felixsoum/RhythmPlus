@@ -4,14 +4,22 @@ using UnityEngine;
 
 public class GameDirector : MonoBehaviour
 {
-    [SerializeField] BeatLines beatLines;
-    [SerializeField] Slider slider;
-    [SerializeField] AudioSource music;
+    [SerializeField] BeatLines beatLines = null;
+    [SerializeField] Slider slider = null;
+    [SerializeField] AudioSource music = null;
+    [SerializeField] GameObject cameraObject = null;
+
     double startTime;
     bool isPlaying;
     public const double DistancePerSec = 10.0;
     BeatLine nextBeatLine;
     const float SuccessDistance = 0.5f;
+    float fullSpinSign;
+    float fullSpinCurrent;
+    float fullSpinTarget;
+    float fullSpinProgress;
+    float fullSpinSpeed = 2.0f;
+    const float CameraAngleMax = 10;
 
     void Awake()
     {
@@ -36,6 +44,42 @@ public class GameDirector : MonoBehaviour
             nextBeatLine = beatLines.GetNext();
         }
 
+        if (fullSpinSign == 0)
+        {
+            if (!slider.FullSpinBound.HasValue)
+            {
+                Vector3 cameraAngles = cameraObject.transform.eulerAngles;
+                cameraAngles.z = Mathf.Lerp(-CameraAngleMax, CameraAngleMax, slider.CurrentPointerValue);
+                cameraObject.transform.eulerAngles = cameraAngles;
+            }
+            else
+            {
+                fullSpinSign = slider.FullSpinBound == 0 ? 1 : -1;
+                fullSpinCurrent = cameraObject.transform.eulerAngles.z;
+                if (fullSpinCurrent > CameraAngleMax)
+                {
+                    fullSpinCurrent -= 360;
+                }
+                else if (fullSpinCurrent < -CameraAngleMax)
+                {
+                    fullSpinCurrent += 360;
+                }
+                fullSpinTarget = fullSpinSign == -1 ? -360 : 360;
+                fullSpinProgress = 0;
+            }
+        }
+        else
+        {
+            fullSpinProgress += Time.deltaTime * fullSpinSpeed;
+            fullSpinProgress = Mathf.Min(fullSpinProgress, 1);
+            Vector3 cameraAngles = cameraObject.transform.eulerAngles;
+            cameraAngles.z = Mathf.Lerp(fullSpinCurrent, fullSpinTarget, fullSpinProgress);
+            if (fullSpinProgress >= 1)
+            {
+                fullSpinSign = 0;
+            }
+            cameraObject.transform.eulerAngles = cameraAngles;
+        }
     }
 
     void Play()

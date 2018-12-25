@@ -7,9 +7,9 @@ using UnityEngine;
 public class BeatLines : MonoBehaviour
 {
     [SerializeField] int beatPerMin = 100;
-    [SerializeField] int beatLineCount;
-    [SerializeField] float startOffset;
-    [SerializeField] GameObject beatLinePrefab;
+    [SerializeField] int beatLineCount = 0;
+    [SerializeField] float startOffset = 0;
+    [SerializeField] GameObject beatLinePrefab = null;
     [SerializeField] List<BeatLine> beatLines = new List<BeatLine>();
 
     int beatLineIndex = -1;

@@ -2,9 +2,12 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class DiscView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class DiscView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerDownHandler
 {
-    [SerializeField] Slider slider;
+    [SerializeField] Slider slider = null;
+    [SerializeField] TapButton leftTapButton;
+    [SerializeField] TapButton rightTapButton;
+
     RectTransform rectTransform;
     Vector2 center;
     Vector2 previousDragPos;
@@ -88,5 +91,17 @@ public class DiscView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         spin = Mathf.Clamp(spin, -spinAngleMax, spinAngleMax);
         rectTransform.Rotate(0, 0, spin);
         slider.Spin(spin);
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (eventData.position.x < center.x)
+        {
+            leftTapButton.OnPointerDown(eventData);
+        }
+        else
+        {
+            rightTapButton.OnPointerDown(eventData);
+        }
     }
 }

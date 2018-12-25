@@ -2,7 +2,7 @@
 
 public class SliderView : MonoBehaviour
 {
-    [SerializeField] RectTransform pointerRectTransform;
+    [SerializeField] RectTransform pointerRectTransform = null;
     RectTransform rectTransform;
     float sliderWidth;
     float pointerWidth;

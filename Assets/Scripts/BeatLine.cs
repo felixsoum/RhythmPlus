@@ -5,8 +5,11 @@ using UnityEngine;
 public class BeatLine : MonoBehaviour
 {
     private const float BeatRandomSpacing = 0.1f;
-    [SerializeField] Renderer beatObject;
-    [SerializeField] Renderer successEffect;
+    [SerializeField] Renderer beatObject = null;
+    [SerializeField] Renderer successEffect = null;
+
+    [Range(0, 1)]
+    [SerializeField] float valueFromSlider = 0.5f;
     public bool containsBeat = true;
     Material successMaterial;
     float successValue = 1.0f;
@@ -21,6 +24,7 @@ public class BeatLine : MonoBehaviour
         {
             beatObject.gameObject.SetActive(containsBeat);
             successEffect.gameObject.SetActive(containsBeat);
+            SetBeat(valueFromSlider);
         }
     }
 
@@ -63,9 +67,15 @@ public class BeatLine : MonoBehaviour
         }
 
         value = Mathf.Clamp01(value);
+        SetBeat(value);
+    }
+
+    void SetBeat(float value)
+    {
         Vector3 pos = beatObject.transform.localPosition;
         pos.x = Mathf.Lerp(leftBound, rightBound, value);
         beatObject.transform.localPosition = pos;
         BeatValue = value;
+        valueFromSlider = value;
     }
 }

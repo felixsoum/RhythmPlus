@@ -47,6 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   beatObject: {fileID: 2562555418218601407}
   successEffect: {fileID: 5797185833277371561}
+  valueFromSlider: 0.5
   containsBeat: 1
 --- !u!1 &1793807028193237269
 GameObject:
