@@ -1,16 +1,21 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class DiscView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    [SerializeField] SliderView sliderView;
+    [SerializeField] Slider slider;
     RectTransform rectTransform;
     Vector2 center;
     Vector2 previousDragPos;
-    const float spinAngleMax = 10.0f;
-    const float spinDistanceMin = 3.0f;
+    const float spinAngleMax = 45.0f;
+    const float spinDistanceMin = 10.0f;
     float angle;
+    float autoSpinSpeed = 100.0f;
+    float autoSpinDecay = 50.0f;
     bool isDragging;
+    const int LastAngleCount = 5;
+    Queue<float> lastAngles = new Queue<float>();
 
     void Start()
     {
@@ -20,9 +25,15 @@ public class DiscView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     void Update()
     {
-        if (isDragging)
+        if (!isDragging)
         {
-
+            Spin(angle * Time.deltaTime * autoSpinSpeed);
+            if (Mathf.Abs(angle) > 0)
+            {
+                float magnitude = Mathf.Abs(angle) - Time.deltaTime * autoSpinDecay;
+                magnitude = Mathf.Max(magnitude, 0);
+                angle = magnitude * Mathf.Sign(angle);
+            }
         }
     }
 
@@ -30,6 +41,7 @@ public class DiscView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     {
         previousDragPos = eventData.position;
         isDragging = true;
+        lastAngles.Clear();
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -40,6 +52,13 @@ public class DiscView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     public void OnEndDrag(PointerEventData eventData)
     {
         Spin(eventData);
+        foreach (var previousAngle in lastAngles)
+        {
+            if (Mathf.Abs(previousAngle) > Mathf.Abs(angle))
+            {
+                angle = previousAngle;
+            }
+        }
         isDragging = false;
     }
 
@@ -53,11 +72,21 @@ public class DiscView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
             return;
         }
         float distance = Vector2.Distance(currentDragPos, previousDragPos);
-        Debug.Log(distanceToCenter);
         angle = Vector2.SignedAngle(previousDragPos - center, currentDragPos - center);
-        angle = Mathf.Clamp(-spinAngleMax, angle, spinAngleMax);
+        angle = Mathf.Clamp(angle, -spinAngleMax, spinAngleMax);
+        lastAngles.Enqueue(angle);
+        if (lastAngles.Count > LastAngleCount)
+        {
+            lastAngles.Dequeue();
+        }
         previousDragPos = currentDragPos;
-        rectTransform.Rotate(0, 0, angle);
-        sliderView.Spin(angle);
+        Spin(angle);
+    }
+
+    void Spin(float spin)
+    {
+        spin = Mathf.Clamp(spin, -spinAngleMax, spinAngleMax);
+        rectTransform.Rotate(0, 0, spin);
+        slider.Spin(spin);
     }
 }

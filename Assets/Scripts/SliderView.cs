@@ -10,7 +10,7 @@ public class SliderView : MonoBehaviour
     float rightBound;
     float spinSpeed;
     float currentPointerValue = 0.5f;
-
+    Vector2 pointerAnchoredPosition;
     void Start()
     {
         spinSpeed = 1 / (360.0f);
@@ -19,13 +19,14 @@ public class SliderView : MonoBehaviour
         pointerWidth = pointerRectTransform.rect.width;
         leftBound = (pointerWidth - sliderWidth) / 2.0f;
         rightBound = (sliderWidth - pointerWidth) / 2.0f;
+        pointerAnchoredPosition = pointerRectTransform.anchoredPosition;
     }
 
     public void Spin(float angle)
     {
         currentPointerValue -= angle * spinSpeed;
         currentPointerValue = Mathf.Clamp01(currentPointerValue);
-        Vector2 anchoredPosition = new Vector2(Mathf.Lerp(leftBound, rightBound, currentPointerValue), 0);
-        pointerRectTransform.anchoredPosition = anchoredPosition;
+        pointerAnchoredPosition.x = Mathf.Lerp(leftBound, rightBound, currentPointerValue);
+        pointerRectTransform.anchoredPosition = pointerAnchoredPosition;
     }
 }
